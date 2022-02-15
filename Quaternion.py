@@ -178,9 +178,9 @@ class Quaternion:
 
 	#squad
 	def squad(self, q2, a, b, t):
-		c = self.SLERP(q2, t)
-		d = a.SLERP(b, t)
-		return c.SLERP(d, 2 * t * (1 - t))
+		c = self.SLERPNoInvert(q2, t)
+		d = a.SLERPNoInvert(b, t)
+		return c.SLERPNoInvert(d, 2 * t * (1 - t))
 
 	#SQUAD
 	def SQUAD(self, q1, q2, q3, t):

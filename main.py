@@ -2,7 +2,7 @@ from Vector3n import Vector3n
 #from Matrix3n import Matrix3n
 #from Quaternion import Quaternion
 
-vect1 = Vector3n(-5, 0, 0)
+vect1 = Vector3n(0, 4, 0)
 axis = Vector3n(0, 0, 1)
 rotatedVector = Vector3n(0, 0, 0)
 
