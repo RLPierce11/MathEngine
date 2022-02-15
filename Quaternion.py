@@ -1,5 +1,5 @@
 # class Quaternion file
-import Vector3n
+#from Vector3n import Vector3n
 import math
 
 class Quaternion:
@@ -8,7 +8,7 @@ class Quaternion:
 		self.vect = vect
 
 	def show(self):
-		print("[" + str(self.s) + ", (" + str(self.vect.x) + ", " + str(self.vect.y) + ", " + str(self.vect.z) + ")]")
+		print("[" + str(round(self.s, 2)) + ", (" + str(round(self.vect.x, 2)) + ", " + str(round(self.vect.y, 2)) + ", " + str(round(self.vect.z, 2)) + ")]")
 
 	#add quaternions
 	def __add__(self, q1):
@@ -95,8 +95,99 @@ class Quaternion:
 		q = Quaternion(scaler, imag)
 		return q
 
+	#LERP-> linear quaternion interpolation
+	def LERP(self, qend, t):
+		q = (self.multS(1 - t) + (qend.multS(t)))
+		#q.normalize()
+		return q
+
+	#SLERP->sqherical linear interpolation
+	def SLERP(self, qend, t):
+		mdot = self.s * qend.s + self.vect.x * qend.vect.x + self.vect.y * qend.vect.y + self.vect.z * qend.vect.z
+
+		if(mdot < 0):
+			mdot = -mdot
+			q3 = qend.multS(-1)
+		else:
+			q3 = qend
+
+		angle = math.cos(mdot)
+		return (self.multS(math.sin(angle * (1 - t))) + q3.multS(math.sin(angle * t))).multS(1/math.sin(angle)) 
+
+	#SLERP no INVERT
+	def SLERPNoInvert(self, qend, t):
+		mdot = self.s * qend.s + self.vect.x * qend.vect.x + self.vect.y * qend.vect.y + self.vect.z * qend.vect.z
+
+		if(mdot > -0.95 and mdot < 0.95):
+			angle = math.acos(mdot)
+			return (self.multS(math.sin(angle * (1 - t))) + qend.multS(math.sin(angle * t))).multS(1/math.sin(angle))
+		else:
+			return self.LERP(qend, t)
+
+	#quaternion logmarithic
+	def Log(self):
+
+		scaler = math.log(self.norm())
+		vmag = self.vect.mag()
+		oneOverMag = 1 / vmag
+		sOverQNorm = self.s / self.norm()
+		a = oneOverMag * math.acos(sOverQNorm)
+		vect = self.vect
+		vect.x = self.vect.x * a
+		vect.y = self.vect.y * a
+		vect.z = self.vect.z * a
+		
+		q = Quaternion(scaler, vect)
+		return q
 
 
+	#quaternion exponential
+	def Exp(self):
+		vNorm = self.vect.mag()
+		sExp = math.exp(self.s)
+		scale = sExp / vNorm * math.sin(vNorm)
+
+		vect = self.vect
+
+		if(vNorm):
+			vect.x = 0
+			vect.y = 0
+			vect.z = 0
+			q = Quaternion(sExp, vect)
+			return q
+
+		vect.x = self.vect.x * scale
+		vect.y = self.vect.y * scale
+		vect.z = self.vect.z * scale
+		q = Quaternion(sExp * math.cos(vNorm), vect)
+		return q
+
+
+	#spline operation for SQUAD
+	def spline(self, q1, q1n):
+		q1Inverse = q1.inverse()
+		log1 = q1Inverse * self
+		log1 = log1.Log()
+		log2 = q1Inverse * q1n
+		log2 = log2.Log()
+		qret = log1 + log2
+		qret = qret.multS(1 / -4)
+		qret.Exp()
+		qret = qret * q1
+		return qret
+
+	#squad
+	def squad(self, q2, a, b, t):
+		c = self.SLERP(q2, t)
+		d = a.SLERP(b, t)
+		return c.SLERP(d, 2 * t * (1 - t))
+
+	#SQUAD
+	def SQUAD(self, q1, q2, q3, t):
+		a = self.spline(q1, q2)
+		b = q1.spline(q2, q3)
+		ret = self.squad(q3, a, b, t)
+		return ret
 
 
 

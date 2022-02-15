@@ -1,3 +1,4 @@
+
 import math
 from Quaternion import Quaternion
 
@@ -123,7 +124,96 @@ class Vector3n:
 		qInverse = rquat.inverse()
 		#rotate the quaternion
 		rotatedVector = rquat * pure * qInverse
+
+		rvect = Vector3n(round(rotatedVector.vect.x, 2), round(rotatedVector.vect.y, 2), round(rotatedVector.vect.z, 2))
 		#return vector of the rotated quaternion
-		return rotatedVector.vect
+		return rvect
+
+	#rotate vector using Quaternion LERP
+	def rotateVectorLERP(self, angle, axis, t):
+		#convert current vector to pure quaternion
+		pure = Quaternion(0, self)
+		#normalize axis input
+		axis.normalize()
+		#create real quaternion using input angle=scaler and axis=vector
+		rquat = Quaternion(angle, axis)
+		#convert real quaternion to norm quaternion
+		rquat.convertToUnitNormQ()
+		#get the inverse of real quaternion
+		qInverse = rquat.inverse()
+		#rotate the quaternion
+		rotatedVector = rquat * pure * qInverse
+
+		qlerp = pure.LERP(rotatedVector, t)
+
+		rvect = Vector3n(round(qlerp.vect.x, 2), round(qlerp.vect.y, 2), round(qlerp.vect.z, 2))
+		#return vector of the rotated quaternion
+		return rvect
+
+	#rotate vector using Quaternion SLERP
+	def rotateVectorSLERP(self, angle, axis, t):
+		#convert current vector to pure quaternion
+		pure = Quaternion(0, self)
+		#normalize axis input
+		axis.normalize()
+		#create real quaternion using input angle=scaler and axis=vector
+		rquat = Quaternion(angle, axis)
+		#convert real quaternion to norm quaternion
+		rquat.convertToUnitNormQ()
+		#get the inverse of real quaternion
+		qInverse = rquat.inverse()
+		#rotate the quaternion
+		rotatedVector = rquat * pure * qInverse
+
+		qslerp = pure.SLERP(rotatedVector, t)
+
+		rvect = Vector3n(round(qslerp.vect.x, 2), round(qslerp.vect.y, 2), round(qslerp.vect.z, 2))
+		#return vector of the rotated quaternion
+		return rvect
+
+	#rotate vector using Quaternion SLERP no invert
+	def rotateVectorSLERPNoInvert(self, angle, axis, t):
+		#convert current vector to pure quaternion
+		pure = Quaternion(0, self)
+		#normalize axis input
+		axis.normalize()
+		#create real quaternion using input angle=scaler and axis=vector
+		rquat = Quaternion(angle, axis)
+		#convert real quaternion to norm quaternion
+		rquat.convertToUnitNormQ()
+		#get the inverse of real quaternion
+		qInverse = rquat.inverse()
+		#rotate the quaternion
+		rotatedVector = rquat * pure * qInverse
+
+		qslerpN = pure.SLERPNoInvert(rotatedVector, t)
+
+		rvect = Vector3n(round(qslerpN.vect.x, 2), round(qslerpN.vect.y, 2), round(qslerpN.vect.z, 2))
+		#return vector of the rotated quaternion
+		return rvect
+
+	#rotate vector using Quaternion SQUAD
+	def rotateVectorSQUAD(self, angle, axis, t):
+		#convert current vector to pure quaternion
+		pure = Quaternion(0, self)
+		#normalize axis input
+		axis.normalize()
+		#create real quaternion using input angle=scaler and axis=vector
+		rquat = Quaternion(angle, axis)
+		#convert real quaternion to norm quaternion
+		rquat.convertToUnitNormQ()
+		#get the inverse of real quaternion
+		qInverse = rquat.inverse()
+		#rotate the quaternion
+		rotatedVector = rquat * pure * qInverse
+
+		q1 = pure.SLERP(rotatedVector, 0.25)
+		q2 = pure.SLERP(rotatedVector, 0.75)
+
+		qsquad = pure.SQUAD(q1, q2, rotatedVector, t)
+
+		rvect = Vector3n(round(qsquad.vect.x, 2), round(qsquad.vect.y, 2), round(qsquad.vect.z, 2))
+		#return vector of the rotated quaternion
+		return rvect
 
 
